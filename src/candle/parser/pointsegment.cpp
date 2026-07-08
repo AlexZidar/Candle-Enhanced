@@ -14,6 +14,7 @@ PointSegment::PointSegment()
     m_toolhead = 0;
     m_isMetric = true;
     m_isAbsolute = true;
+    m_isInverseTimeFeed = false;
     m_isZMovement = false;
     m_isArc = false;
     m_isSpline = false;
@@ -224,6 +225,7 @@ void PointSegment::convertToMetric() {
         this->m_arcProperties->radius *= 25.4;
     }
 }
+
 bool PointSegment::isAbsolute() const
 {
     return m_isAbsolute;
@@ -232,6 +234,16 @@ bool PointSegment::isAbsolute() const
 void PointSegment::setIsAbsolute(bool isAbsolute)
 {
     m_isAbsolute = isAbsolute;
+}
+
+bool PointSegment::isInverseTimeFeed() const
+{
+    return m_isInverseTimeFeed;
+}
+
+void PointSegment::setIsInverseTimeFeed(bool isInverseTimeFeed)
+{
+    m_isInverseTimeFeed = isInverseTimeFeed;
 }
 
 PointSegment::planes PointSegment::plane() const

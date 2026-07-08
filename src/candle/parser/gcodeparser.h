@@ -52,6 +52,7 @@ private:
     bool m_isMetric;
     bool m_inAbsoluteMode;
     bool m_inAbsoluteIJKMode;
+    bool m_isInverseTimeFeed;
     float m_lastGcodeCommand;
     QVector3D m_currentPoint;
     QVector3D m_currentAxes;

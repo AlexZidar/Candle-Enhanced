@@ -13,6 +13,7 @@ GcodeParser::GcodeParser()
 {
     m_isMetric = true;
     m_inAbsoluteMode = true;
+    m_isInverseTimeFeed = false;
     m_inAbsoluteIJKMode = false;
     m_lastGcodeCommand = -1;
     m_commandNumber = 0;
@@ -228,6 +229,8 @@ int GcodeParser::getCommandNumber() const
 
 PointSegment *GcodeParser::processCommand(const QStringList &args)
 {
+    static QList<float> movementGCodes = { 0.0f, 1.0f, 2.0f, 3.0f, 5.0f, 5.1f, 38.2f };
+
     QList<float> gCodes;
     PointSegment *ps = NULL;
 
@@ -243,7 +246,11 @@ PointSegment *GcodeParser::processCommand(const QStringList &args)
     gCodes = GcodePreprocessorUtils::parseCodes(args, 'G');
 
     // If there was no command, add the implicit one to the party.
-    if (gCodes.isEmpty() && m_lastGcodeCommand != -1) {
+    bool containsMovementGCode = std::any_of(movementGCodes.constBegin(), movementGCodes.constEnd(), [&gCodes](float movementGCode) {
+        return gCodes.contains(movementGCode);
+    });
+
+    if (!containsMovementGCode) {
         gCodes.append(m_lastGcodeCommand);
     }
 
@@ -273,6 +280,7 @@ PointSegment *GcodeParser::addLinearPointSegment(const QVector3D &nextPoint,
     ps->setIsZMovement(zOnly);
     ps->setIsFastTraverse(fastTraverse);
     ps->setIsAbsolute(this->m_inAbsoluteMode);
+    ps->setIsInverseTimeFeed(m_isInverseTimeFeed);
     ps->setSpeed(fastTraverse ? this->m_traverseSpeed : this->m_lastSpeed);
     ps->setSpindleSpeed(this->m_lastSpindleSpeed);
     this->m_points.append(ps);
@@ -323,6 +331,7 @@ PointSegment *GcodeParser::addArcPointSegment(const QVector3D &nextPoint,
     ps->setRadius(radius);
     ps->setIsClockwise(clockwise);
     ps->setIsAbsolute(this->m_inAbsoluteMode);
+    ps->setIsInverseTimeFeed(m_isInverseTimeFeed);
     ps->setSpeed(this->m_lastSpeed);
     ps->setSpindleSpeed(this->m_lastSpindleSpeed);
     ps->setPlane(m_currentPlane);
@@ -400,6 +409,7 @@ PointSegment *GcodeParser::addSplinePointSegment(const QVector3D &nextPoint,
     ps->setSplineType(type);
     ps->setIsMetric(this->m_isMetric);
     ps->setIsAbsolute(this->m_inAbsoluteMode);
+    ps->setIsInverseTimeFeed(this->m_isInverseTimeFeed);
     ps->setSpeed(this->m_lastSpeed);
     ps->setSpindleSpeed(this->m_lastSpindleSpeed);
     ps->setPlane(m_currentPlane);
@@ -445,6 +455,8 @@ PointSegment * GcodeParser::handleGCode(float code, const QStringList &args)
     else if (code == 90.1f) this->m_inAbsoluteIJKMode = true;
     else if (code == 91.0f) this->m_inAbsoluteMode = false;
     else if (code == 91.1f) this->m_inAbsoluteIJKMode = false;
+    else if (code == 93.0f) this->m_isInverseTimeFeed = true;
+    else if (code == 94.0f) this->m_isInverseTimeFeed = false;
 
     if (code == 0.0f || code == 1.0f || code == 2.0f || code == 3.0f || code == 5.0f || code == 5.1f || code == 38.2f) this->m_lastGcodeCommand = code;
 

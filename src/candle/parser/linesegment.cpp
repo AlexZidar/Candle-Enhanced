@@ -223,6 +223,16 @@ void LineSegment::setIsZMovement(bool isZ)
     m_flags.isZMovement = isZ;
 }
 
+bool LineSegment::isInverseTimeFeed() const
+{
+    return m_flags.isInverseTimeFeed;
+}
+
+void LineSegment::setIsInverseTimeFeed(bool isInverseTimeFeed)
+{
+    m_flags.isInverseTimeFeed = isInverseTimeFeed;
+}
+
 int LineSegment::vertexIndex() const
 {
     return m_vertexIndex;

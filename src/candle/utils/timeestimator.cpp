@@ -218,6 +218,8 @@ float TimeEstimator::getNominalVelocity(const LineSegment *segment)
         result = m_cacheNominalVelocity.at(segment->index());
     } else {
         result = segment->getSpeed();
+        if (segment->isInverseTimeFeed())
+            result *= getVector(segment).length();
         if (m_feedOverride && !segment->isFastTraverse()) {
             result *= m_feedOverrideValue;
         } else if (m_rapidOverride && segment->isFastTraverse()) {

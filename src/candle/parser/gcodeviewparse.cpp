@@ -205,6 +205,7 @@ void GcodeViewParse::updateFromParser(GcodeParser *gp, double arcPrecision, bool
                         ls->setIsZMovement(ps->isZMovement());
                         ls->setIsMetric(isMetric);
                         ls->setIsAbsolute(ps->isAbsolute());
+                        ls->setIsInverseTimeFeed(ps->isInverseTimeFeed());
                         ls->setSpeed(ps->getSpeed());
                         ls->setSpindleSpeed(ps->getSpindleSpeed());
                         ls->setDwell(ps->getDwell());
@@ -251,6 +252,7 @@ void GcodeViewParse::updateFromParser(GcodeParser *gp, double arcPrecision, bool
                         ls->setIsZMovement(ps->isZMovement());
                         ls->setIsMetric(isMetric);
                         ls->setIsAbsolute(ps->isAbsolute());
+                        ls->setIsInverseTimeFeed(ps->isInverseTimeFeed());
                         ls->setSpeed(ps->getSpeed());
                         ls->setSpindleSpeed(ps->getSpindleSpeed());
                         ls->setDwell(ps->getDwell());
@@ -295,6 +297,7 @@ void GcodeViewParse::updateFromParser(GcodeParser *gp, double arcPrecision, bool
                     ls->setIsZMovement(ps->isZMovement());
                     ls->setIsMetric(isMetric);
                     ls->setIsAbsolute(ps->isAbsolute());
+                    ls->setIsInverseTimeFeed(ps->isInverseTimeFeed());
                     ls->setSpeed(ps->getSpeed());
                     ls->setSpindleSpeed(ps->getSpindleSpeed());
                     ls->setDwell(ps->getDwell());

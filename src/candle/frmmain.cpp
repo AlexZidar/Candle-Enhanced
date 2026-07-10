@@ -1005,6 +1005,7 @@ void frmMain::on_cmdFileReset_clicked()
         ui->tblProgram->scrollTo(m_currentModel->index(0, 0));
         ui->tblProgram->clearSelection();
         ui->tblProgram->selectRow(0);
+        ui->glwVisualizer->setCursorPos(QVector3D());
 
         ui->glwVisualizer->setSpendTime(QTime(0, 0, 0));
     } else {
@@ -1438,6 +1439,7 @@ void frmMain::on_chkHeightMapUse_clicked(bool checked)
 
         // Select first row
         ui->tblProgram->selectRow(0);
+        ui->glwVisualizer->setCursorPos(QVector3D());
     }
     catch (CancelException) {                       // Cancel modification
         m_programHeightmapModel.clear();
@@ -1451,6 +1453,7 @@ void frmMain::on_chkHeightMapUse_clicked(bool checked)
         connect(ui->tblProgram->selectionModel(), &QItemSelectionModel::selectionChanged, this, &frmMain::onTableSelectionChanged);
 
         ui->tblProgram->selectRow(0);
+        ui->glwVisualizer->setCursorPos(QVector3D());
 
         ui->chkHeightMapUse->setChecked(false);
 
@@ -1595,6 +1598,7 @@ void frmMain::on_cmdHeightMapMode_toggled(bool checked)
 
     if (checked) {
         ui->tblProgram->selectRow(0);
+        ui->glwVisualizer->setCursorPos(QVector3D());
         ui->tblProgram->setModel(&m_probeModel);
         resizeTableHeightMapSections();
         m_currentModel = &m_probeModel;
@@ -1614,6 +1618,7 @@ void frmMain::on_cmdHeightMapMode_toggled(bool checked)
             connect(ui->tblProgram->selectionModel(), &QItemSelectionModel::selectionChanged, this, &frmMain::onTableSelectionChanged);
 
             ui->tblProgram->selectRow(0);
+            ui->glwVisualizer->setCursorPos(QVector3D());
 
             ui->glwVisualizer->updateModelBounds(m_codeDrawer);
             updateProgramEstimatedTime(*m_currentDrawer->viewParser()->getLineSegments());
@@ -2972,10 +2977,14 @@ void frmMain::onTableCurrentChanged(const QModelIndex &idx1, const QModelIndex &
 
         if (line > 0 && line < lineIndexes->count() && !lineIndexes->at(line).isEmpty())
         {
-            QVector3D pos = list->at(lineIndexes->at(line).last())->getEnd();
+            LineSegment* ls = list->at(lineIndexes->at(line).last());
+
+            QVector3D pos = ls->getEnd();
             m_selectionDrawer->setPosition(m_codeDrawer->getIgnoreZ() ? QVector3D(pos.x(), pos.y(), 0) : pos);
             m_selectionDrawer->setVisible(true);
             m_selectionDrawer->update();
+
+            ui->glwVisualizer->setCursorPos(ls->modelEnd());
         }
         else
         {
@@ -4901,6 +4910,7 @@ void frmMain::loadFile(const QList<QString> &data)
     connect(ui->tblProgram->selectionModel(), &QItemSelectionModel::selectionChanged, this, &frmMain::onTableSelectionChanged);
 
     ui->tblProgram->selectRow(0);
+    ui->glwVisualizer->setCursorPos(QVector3D());
 
     //  Update code drawer
     m_codeDrawer->update();
@@ -5138,6 +5148,7 @@ void frmMain::newFile()
     connect(ui->tblProgram->selectionModel(), &QItemSelectionModel::selectionChanged, this, &frmMain::onTableSelectionChanged);
 
     ui->tblProgram->selectRow(0);
+    ui->glwVisualizer->setCursorPos(QVector3D());
 
     // Clear selection marker
     m_selectionDrawer->setVisible(false);

@@ -2340,7 +2340,13 @@ void frmMain::onConnectionDataReceived(QString data)
                 }
 
                 // Homing response
-                if ((uncomment == "$H" || uncomment == "$T") && m_homing) m_homing = false;
+                if ((uncomment == "$H" || uncomment == "$T") && m_homing) {
+                    m_homing = false;
+
+                    // Query grbl settings
+                    sendCommand("$$", -2, m_settings->showUICommands());
+                    sendCommand("$#", -2, m_settings->showUICommands(), true);
+                }
 
                 // Reset complete response
                 if (uncomment == "[CTRL+X]") {
@@ -2348,8 +2354,8 @@ void frmMain::onConnectionDataReceived(QString data)
                     m_updateParserStatus = true;
 
                     // Query grbl settings
-                    sendCommand("$$", -2, false);
-                    sendCommand("$#", -2, false, true);
+                    sendCommand("$$", -2, m_settings->showUICommands());
+                    sendCommand("$#", -2, m_settings->showUICommands(), true);
                 }
 
                 // Clear command buffer on "M2" & "M30" command (old firmwares)
@@ -2683,8 +2689,8 @@ void frmMain::onConnectionConnected()
             setDeviceState(DeviceUnknown);
 
             // Query grbl settings
-            sendCommand("$$", -2, false);
-            sendCommand("$#", -2, false, true);
+            sendCommand("$$", -2, m_settings->showUICommands());
+            sendCommand("$#", -2, m_settings->showUICommands(), true);
         }
     });
 }

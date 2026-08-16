@@ -1485,7 +1485,7 @@ segment size:</source>
     </message>
     <message>
         <source>Custom theme</source>
-        <translation>Своя тема</translation>
+        <translation>Настраиваемая тема</translation>
     </message>
     <message>
         <source>Palette colors</source>
@@ -1497,7 +1497,7 @@ segment size:</source>
     </message>
     <message>
         <source>Window text:</source>
-        <translation>Текст:</translation>
+        <translation>Текст окна:</translation>
     </message>
     <message>
         <source>Base:</source>

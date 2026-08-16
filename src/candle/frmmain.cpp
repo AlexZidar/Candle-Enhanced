@@ -41,9 +41,14 @@
 frmMain::frmMain(QWidget *parent) : QMainWindow(parent), ui(new Ui::frmMain)
 {
     m_defaultPalette = qApp->palette();
-    m_defaultStyleName = QStyleFactory::keys().first();
 
-    qInfo(generalLogCategory) << "System style theme name: " << m_defaultStyleName;
+#ifdef Q_OS_WIN
+    m_defaultStyleName = "windowsvista";
+#elif Q_OS_MACOS
+    m_defaultStyleName = "macintosh";
+#else
+    m_defaultStyleName = "fusion";
+#endif
 
     initVariables();
 
@@ -5721,31 +5726,45 @@ void frmMain::resetTableSelection()
 
 void frmMain::adjustButtonIconColors()
 {
-    auto inverted = qApp->palette().color(QPalette::Button).value() <= 127;
+    auto uiButtonsInverted = qApp->palette().color(QPalette::Button).value() <= 127;
 
     for (auto button : findChildren<StyledToolButton*>())
     {
-        if (inverted) {
+        if (uiButtonsInverted) {
             Util::invertButtonIconColors(button);
         } else {
             Util::restoreButtonIconColors(button);
         }
     }
 
-    static QList<QAbstractButton*> buttons = {
+    static QList<QAbstractButton*> uiButtons = {
+        ui->cmdCommandSend,
+        ui->cmdClearConsole
+    };
+
+    for (auto button : uiButtons)
+    {
+        if (uiButtonsInverted) {
+            Util::invertButtonIconColors(button);
+        } else {
+            Util::restoreButtonIconColors(button);
+        }
+    }
+
+    static QList<QAbstractButton*> visualizerButtons = {
         ui->cmdFit,
         ui->cmdIsometric,
         ui->cmdFront,
         ui->cmdLeft,
         ui->cmdTop,
-        ui->cmdPerspective,
-        ui->cmdCommandSend,
-        ui->cmdClearConsole
+        ui->cmdPerspective
     };
 
-    for (auto button : buttons)
+    auto visualizerButtonsInverted = m_settings->colors("VisualizerBackground").value() <= 127;
+
+    for (auto button : visualizerButtons)
     {
-        if (inverted) {
+        if (visualizerButtonsInverted) {
             Util::invertButtonIconColors(button);
         } else {
             Util::restoreButtonIconColors(button);

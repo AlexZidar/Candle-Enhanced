@@ -537,6 +537,7 @@ private:
     bool eventFilter(QObject *obj, QEvent *event);
     void updateSliderProgramMaxValue();
     void resetTableSelection();
+    void adjustButtonIconColors();
 
     // Utility
     int bufferLength();

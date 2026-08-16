@@ -41,7 +41,9 @@
 frmMain::frmMain(QWidget *parent) : QMainWindow(parent), ui(new Ui::frmMain)
 {
     m_defaultPalette = qApp->palette();
-    m_defaultStyleName = qApp->style()->objectName();
+    m_defaultStyleName = QStyleFactory::keys().first();
+
+    qInfo(generalLogCategory) << "System style theme name: " << m_defaultStyleName;
 
     initVariables();
 
@@ -648,6 +650,7 @@ void frmMain::on_actServiceSettings_triggered()
     if (m_settings->exec()) {
         applySettings();
         emit settingsAccepted();
+        adjustButtonIconColors();
     } else {
         m_settings->undo();
         emit settingsRejected();
@@ -3820,6 +3823,8 @@ void frmMain::restoreSettings()
     // Load plugin settings
     emit settingsLoaded();
 
+    adjustButtonIconColors();
+
     // Panels
     ui->scrollContentsDevice->restoreState(this, set->value("devicePanels").toStringList());
     ui->scrollContentsModification->restoreState(this, set->value("modificationPanels").toStringList());
@@ -4177,22 +4182,6 @@ void frmMain::applySettings()
                 background-color: %3} QToolButton:hover {border: 1px solid %2;}")
                 .arg(normal.name()).arg(highlight.name())
                 .arg(base.name()));
-
-    ui->cmdFit->setIcon(QIcon(":/images/fit_1.png"));
-    ui->cmdIsometric->setIcon(QIcon(":/images/cube.png"));
-    ui->cmdFront->setIcon(QIcon(":/images/cubeFront.png"));
-    ui->cmdLeft->setIcon(QIcon(":/images/cubeLeft.png"));
-    ui->cmdTop->setIcon(QIcon(":/images/cubeTop.png"));
-    ui->cmdPerspective->setIcon(QIcon(":/images/perspective.png"));
-
-    if (!light) {
-        Util::invertButtonIconColors(ui->cmdFit);
-        Util::invertButtonIconColors(ui->cmdIsometric);
-        Util::invertButtonIconColors(ui->cmdFront);
-        Util::invertButtonIconColors(ui->cmdLeft);
-        Util::invertButtonIconColors(ui->cmdTop);
-        Util::invertButtonIconColors(ui->cmdPerspective);
-    }
 
     int h = ui->cmdFileOpen->sizeHint().height();
     QSize s(h, h);
@@ -5728,6 +5717,40 @@ void frmMain::resetTableSelection()
     ui->tblProgram->selectionModel()->clearSelection();
     ui->tblProgram->scrollTo(index);
     ui->tblProgram->setCurrentIndex(index);
+}
+
+void frmMain::adjustButtonIconColors()
+{
+    auto inverted = qApp->palette().color(QPalette::Button).value() <= 127;
+
+    for (auto button : findChildren<StyledToolButton*>())
+    {
+        if (inverted) {
+            Util::invertButtonIconColors(button);
+        } else {
+            Util::restoreButtonIconColors(button);
+        }
+    }
+
+    static QList<QAbstractButton*> buttons = {
+        ui->cmdFit,
+        ui->cmdIsometric,
+        ui->cmdFront,
+        ui->cmdLeft,
+        ui->cmdTop,
+        ui->cmdPerspective,
+        ui->cmdCommandSend,
+        ui->cmdClearConsole
+    };
+
+    for (auto button : buttons)
+    {
+        if (inverted) {
+            Util::invertButtonIconColors(button);
+        } else {
+            Util::restoreButtonIconColors(button);
+        }
+    }
 }
 
 int frmMain::bufferLength()

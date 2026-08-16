@@ -58,11 +58,6 @@ QGroupBox[checkable="true"]::indicator:unchecked {
 	image: url(:/images/expand.png);
 }
 
-QTableView {
-	selection-background-color: #cdcdff;
-	selection-color: rgb(0, 0, 0);
-}
-
 QSlider:horizontal {
 	padding-top: 10;
 }

@@ -263,6 +263,16 @@ void GLWidget::setBufferState(const QString &bufferState)
     m_bufferState = bufferState;
 }
 
+QVector3D GLWidget::cursorPos() const
+{
+    return m_cursorPos;
+}
+
+void GLWidget::setCursorPos(const QVector3D &cursorPos)
+{
+    m_cursorPos = cursorPos;
+}
+
 QString GLWidget::parserStatus() const
 {
     return m_parserStatus;

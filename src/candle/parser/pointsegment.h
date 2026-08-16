@@ -59,6 +59,9 @@ public:
     bool isAbsolute() const;
     void setIsAbsolute(bool isAbsolute);
 
+    bool isInverseTimeFeed() const;
+    void setIsInverseTimeFeed(bool isInverseTimeFeed);
+
     planes plane() const;
     void setPlane(const planes &plane);
 
@@ -94,6 +97,7 @@ private:
     bool m_isSpline;
     bool m_isFastTraverse;
     bool m_isAbsolute;
+    bool m_isInverseTimeFeed;
     int m_lineNumber;
     planes m_plane;
 };

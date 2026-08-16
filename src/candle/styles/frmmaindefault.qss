@@ -13,7 +13,6 @@ QMainWindow::separator {
 }
 
 QDockWidget::title {
-	background-color: lightgray;
 	padding: 5 0 5 11;
 	text-align: left center;
 }
@@ -61,11 +60,6 @@ QGroupBox[checkable="true"]::indicator:checked {
 
 QGroupBox[checkable="true"]::indicator:unchecked {	
 	image: url(:/images/expand.png);
-}
-
-QTableView {
-	selection-background-color: #cdcdff;
-	selection-color: rgb(0, 0, 0);
 }
 
 QSlider:horizontal {

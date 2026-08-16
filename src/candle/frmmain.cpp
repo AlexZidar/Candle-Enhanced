@@ -41,7 +41,9 @@
 frmMain::frmMain(QWidget *parent) : QMainWindow(parent), ui(new Ui::frmMain)
 {
     m_defaultPalette = qApp->palette();
-    m_defaultStyleName = qApp->style()->objectName();
+    m_defaultStyleName = QStyleFactory::keys().first();
+
+    qInfo(generalLogCategory) << "System style theme name: " << m_defaultStyleName;
 
     initVariables();
 
@@ -648,6 +650,7 @@ void frmMain::on_actServiceSettings_triggered()
     if (m_settings->exec()) {
         applySettings();
         emit settingsAccepted();
+        adjustButtonIconColors();
     } else {
         m_settings->undo();
         emit settingsRejected();
@@ -1010,6 +1013,7 @@ void frmMain::on_cmdFileReset_clicked()
         ui->tblProgram->scrollTo(m_currentModel->index(0, 0));
         ui->tblProgram->clearSelection();
         ui->tblProgram->selectRow(0);
+        ui->glwVisualizer->setCursorPos(QVector3D());
 
         ui->glwVisualizer->setSpendTime(QTime(0, 0, 0));
     } else {
@@ -1443,6 +1447,7 @@ void frmMain::on_chkHeightMapUse_clicked(bool checked)
 
         // Select first row
         ui->tblProgram->selectRow(0);
+        ui->glwVisualizer->setCursorPos(QVector3D());
     }
     catch (CancelException) {                       // Cancel modification
         m_programHeightmapModel.clear();
@@ -1456,6 +1461,7 @@ void frmMain::on_chkHeightMapUse_clicked(bool checked)
         connect(ui->tblProgram->selectionModel(), &QItemSelectionModel::selectionChanged, this, &frmMain::onTableSelectionChanged);
 
         ui->tblProgram->selectRow(0);
+        ui->glwVisualizer->setCursorPos(QVector3D());
 
         ui->chkHeightMapUse->setChecked(false);
 
@@ -1600,6 +1606,7 @@ void frmMain::on_cmdHeightMapMode_toggled(bool checked)
 
     if (checked) {
         ui->tblProgram->selectRow(0);
+        ui->glwVisualizer->setCursorPos(QVector3D());
         ui->tblProgram->setModel(&m_probeModel);
         resizeTableHeightMapSections();
         m_currentModel = &m_probeModel;
@@ -1619,6 +1626,7 @@ void frmMain::on_cmdHeightMapMode_toggled(bool checked)
             connect(ui->tblProgram->selectionModel(), &QItemSelectionModel::selectionChanged, this, &frmMain::onTableSelectionChanged);
 
             ui->tblProgram->selectRow(0);
+            ui->glwVisualizer->setCursorPos(QVector3D());
 
             ui->glwVisualizer->updateModelBounds(m_codeDrawer);
             updateProgramEstimatedTime(*m_currentDrawer->viewParser()->getLineSegments());
@@ -2340,7 +2348,13 @@ void frmMain::onConnectionDataReceived(QString data)
                 }
 
                 // Homing response
-                if ((uncomment == "$H" || uncomment == "$T") && m_homing) m_homing = false;
+                if ((uncomment == "$H" || uncomment == "$T") && m_homing) {
+                    m_homing = false;
+
+                    // Query grbl settings
+                    sendCommand("$$", -2, m_settings->showUICommands());
+                    sendCommand("$#", -2, m_settings->showUICommands(), true);
+                }
 
                 // Reset complete response
                 if (uncomment == "[CTRL+X]") {
@@ -2348,8 +2362,8 @@ void frmMain::onConnectionDataReceived(QString data)
                     m_updateParserStatus = true;
 
                     // Query grbl settings
-                    sendCommand("$$", -2, false);
-                    sendCommand("$#", -2, false, true);
+                    sendCommand("$$", -2, m_settings->showUICommands());
+                    sendCommand("$#", -2, m_settings->showUICommands(), true);
                 }
 
                 // Clear command buffer on "M2" & "M30" command (old firmwares)
@@ -2683,8 +2697,8 @@ void frmMain::onConnectionConnected()
             setDeviceState(DeviceUnknown);
 
             // Query grbl settings
-            sendCommand("$$", -2, false);
-            sendCommand("$#", -2, false, true);
+            sendCommand("$$", -2, m_settings->showUICommands());
+            sendCommand("$#", -2, m_settings->showUICommands(), true);
         }
     });
 }
@@ -2977,10 +2991,14 @@ void frmMain::onTableCurrentChanged(const QModelIndex &idx1, const QModelIndex &
 
         if (line > 0 && line < lineIndexes->count() && !lineIndexes->at(line).isEmpty())
         {
-            QVector3D pos = list->at(lineIndexes->at(line).last())->getEnd();
+            LineSegment* ls = list->at(lineIndexes->at(line).last());
+
+            QVector3D pos = ls->getEnd();
             m_selectionDrawer->setPosition(m_codeDrawer->getIgnoreZ() ? QVector3D(pos.x(), pos.y(), 0) : pos);
             m_selectionDrawer->setVisible(true);
             m_selectionDrawer->update();
+
+            ui->glwVisualizer->setCursorPos(ls->modelEnd());
         }
         else
         {
@@ -3805,6 +3823,8 @@ void frmMain::restoreSettings()
     // Load plugin settings
     emit settingsLoaded();
 
+    adjustButtonIconColors();
+
     // Panels
     ui->scrollContentsDevice->restoreState(this, set->value("devicePanels").toStringList());
     ui->scrollContentsModification->restoreState(this, set->value("modificationPanels").toStringList());
@@ -4162,22 +4182,6 @@ void frmMain::applySettings()
                 background-color: %3} QToolButton:hover {border: 1px solid %2;}")
                 .arg(normal.name()).arg(highlight.name())
                 .arg(base.name()));
-
-    ui->cmdFit->setIcon(QIcon(":/images/fit_1.png"));
-    ui->cmdIsometric->setIcon(QIcon(":/images/cube.png"));
-    ui->cmdFront->setIcon(QIcon(":/images/cubeFront.png"));
-    ui->cmdLeft->setIcon(QIcon(":/images/cubeLeft.png"));
-    ui->cmdTop->setIcon(QIcon(":/images/cubeTop.png"));
-    ui->cmdPerspective->setIcon(QIcon(":/images/perspective.png"));
-
-    if (!light) {
-        Util::invertButtonIconColors(ui->cmdFit);
-        Util::invertButtonIconColors(ui->cmdIsometric);
-        Util::invertButtonIconColors(ui->cmdFront);
-        Util::invertButtonIconColors(ui->cmdLeft);
-        Util::invertButtonIconColors(ui->cmdTop);
-        Util::invertButtonIconColors(ui->cmdPerspective);
-    }
 
     int h = ui->cmdFileOpen->sizeHint().height();
     QSize s(h, h);
@@ -4974,6 +4978,7 @@ void frmMain::loadFile(const QList<QString> &data)
     connect(ui->tblProgram->selectionModel(), &QItemSelectionModel::selectionChanged, this, &frmMain::onTableSelectionChanged);
 
     ui->tblProgram->selectRow(0);
+    ui->glwVisualizer->setCursorPos(QVector3D());
 
     //  Update code drawer
     m_codeDrawer->update();
@@ -5211,6 +5216,7 @@ void frmMain::newFile()
     connect(ui->tblProgram->selectionModel(), &QItemSelectionModel::selectionChanged, this, &frmMain::onTableSelectionChanged);
 
     ui->tblProgram->selectRow(0);
+    ui->glwVisualizer->setCursorPos(QVector3D());
 
     // Clear selection marker
     m_selectionDrawer->setVisible(false);
@@ -5711,6 +5717,40 @@ void frmMain::resetTableSelection()
     ui->tblProgram->selectionModel()->clearSelection();
     ui->tblProgram->scrollTo(index);
     ui->tblProgram->setCurrentIndex(index);
+}
+
+void frmMain::adjustButtonIconColors()
+{
+    auto inverted = qApp->palette().color(QPalette::Button).value() <= 127;
+
+    for (auto button : findChildren<StyledToolButton*>())
+    {
+        if (inverted) {
+            Util::invertButtonIconColors(button);
+        } else {
+            Util::restoreButtonIconColors(button);
+        }
+    }
+
+    static QList<QAbstractButton*> buttons = {
+        ui->cmdFit,
+        ui->cmdIsometric,
+        ui->cmdFront,
+        ui->cmdLeft,
+        ui->cmdTop,
+        ui->cmdPerspective,
+        ui->cmdCommandSend,
+        ui->cmdClearConsole
+    };
+
+    for (auto button : buttons)
+    {
+        if (inverted) {
+            Util::invertButtonIconColors(button);
+        } else {
+            Util::restoreButtonIconColors(button);
+        }
+    }
 }
 
 int frmMain::bufferLength()

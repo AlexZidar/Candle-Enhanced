@@ -72,6 +72,9 @@ public:
     bool isZMovement();
     void setIsZMovement(bool isZ);
 
+    bool isInverseTimeFeed() const;
+    void setIsInverseTimeFeed(bool isInverseTimeFeed);
+
     int vertexIndex() const;
     void setVertexIndex(int vertexIndex);
 
@@ -101,6 +104,7 @@ private:
         uint16_t isMetric : 1;
         uint16_t isSpline : 1;
         uint16_t isZMovement : 1;
+        uint16_t isInverseTimeFeed : 1;
     };
 
     Flags m_flags;

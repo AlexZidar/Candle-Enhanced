@@ -115,7 +115,26 @@ public:
 
     static void invertButtonIconColors(QAbstractButton *button)
     {
-        button->setIcon(invertIconColors(button->icon()));
+        auto originalIcon = button->property("originalIcon");
+
+        if (!originalIcon.isValid()) {
+            originalIcon = QVariant::fromValue(button->icon());
+            button->setProperty("originalIcon", originalIcon);
+        }
+
+        button->setIcon(invertIconColors(originalIcon.value<QIcon>()));
+    }
+
+    static void restoreButtonIconColors(QAbstractButton *button)
+    {
+        auto originalIcon = button->property("originalIcon");
+
+        if (!originalIcon.isValid()) {
+            originalIcon = QVariant::fromValue(button->icon());
+            button->setProperty("originalIcon", originalIcon);
+        }
+
+        button->setIcon(originalIcon.value<QIcon>());
     }
 
     static double normalizeRotation(double value)

@@ -664,9 +664,7 @@ IconDelegate.prototype.paint = function(painter, option, index)
 {
     var q = index.data(Qt.DecorationRole);
 
-    if (option.state() & QStyle.State_Selected) {
-        painter.fillRect(option.rect(), new QColor(0xcdcdff));
-    }
+    painter.save();
 
     if (q) {
         q.paint(painter, option.rect());
@@ -678,6 +676,8 @@ IconDelegate.prototype.paint = function(painter, option, index)
         painter.setPen(p);
         painter.drawRect(option.rect().adjusted(1, 0, -2, -1));
     }
+
+    painter.restore();
 }
 
 // Code cell delegate
@@ -733,9 +733,7 @@ CodeDelegate.prototype.paint = function(painter, option, index)
 {
     var q = index.data();
 
-    if (option.state() & QStyle.State_Selected) {
-        painter.fillRect(option.rect(), new QColor(0xcdcdff));
-    }
+    painter.save();
 
     if (q) {
         var m = new QFontMetrics(option.font());
@@ -759,6 +757,8 @@ CodeDelegate.prototype.paint = function(painter, option, index)
         painter.setPen(p);
         painter.drawRect(option.rect().adjusted(1, 0, -2, -1));
     }
+
+    painter.restore();
 }
 
 // Type cell delegate
@@ -800,9 +800,7 @@ TypeDelegate.prototype.paint = function(painter, option, index)
 {
     var q = index.data() == "0" ? qsTr("G-code") : qsTr("Script");
 
-    if (option.state() & QStyle.State_Selected) {
-        painter.fillRect(option.rect(), new QColor(0xcdcdff));
-    }
+    painter.save();
 
     if (q) {
         var r = option.rect().adjusted(4, 4, -4, -4);
@@ -815,6 +813,8 @@ TypeDelegate.prototype.paint = function(painter, option, index)
         painter.setPen(p);
         painter.drawRect(option.rect().adjusted(1, 0, -2, -1));
     }
+
+    painter.restore();
 }
 
 // Check list dialog

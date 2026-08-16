@@ -16,12 +16,18 @@ void Overlay::paintEvent(QPaintEvent *pe)
     QPainter painter(this);
     QFontMetrics fm(painter.font());
 
-    auto xbounds = QString("X: %1 ... %2").arg(m_parent->m_modelLowerBounds.x(), 0, 'f', 3)
-        .arg(m_parent->m_modelUpperBounds.x(), 0, 'f', 3);
-    auto ybounds = QString("Y: %1 ... %2").arg(m_parent->m_modelLowerBounds.y(), 0, 'f', 3)
-        .arg(m_parent->m_modelUpperBounds.y(), 0, 'f', 3);
-    auto zbounds = QString("Z: %1 ... %2").arg(m_parent->m_modelLowerBounds.z(), 0, 'f', 3)
-        .arg(m_parent->m_modelUpperBounds.z(), 0, 'f', 3);
+    auto xbounds = QString("X: %1 ... %2 (%3)")
+        .arg(m_parent->m_modelLowerBounds.x(), 0, 'f', 3)
+        .arg(m_parent->m_modelUpperBounds.x(), 0, 'f', 3)
+        .arg(m_parent->m_cursorPos.x(), 0, 'f', 3);
+    auto ybounds = QString("Y: %1 ... %2 (%3)")
+        .arg(m_parent->m_modelLowerBounds.y(), 0, 'f', 3)
+        .arg(m_parent->m_modelUpperBounds.y(), 0, 'f', 3)
+        .arg(m_parent->m_cursorPos.y(), 0, 'f', 3);
+    auto zbounds = QString("Z: %1 ... %2 (%3)")
+        .arg(m_parent->m_modelLowerBounds.z(), 0, 'f', 3)
+        .arg(m_parent->m_modelUpperBounds.z(), 0, 'f', 3)
+        .arg(m_parent->m_cursorPos.z(), 0, 'f', 3);
     auto ranges = QString("%1 / %2 / %3").arg(m_parent->m_modelRanges.x(), 0, 'f', 3)
         .arg(m_parent->m_modelRanges.y(), 0, 'f', 3).arg(m_parent->m_modelRanges.z(), 0, 'f', 3);
     auto vertices = QString(tr("Vertices: %1")).arg(m_parent->m_vertices);

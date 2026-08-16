@@ -46,6 +46,9 @@ public:
     QString bufferState() const;
     void setBufferState(const QString &bufferState);
 
+    QVector3D cursorPos() const;
+    void setCursorPos(const QVector3D &cursorPos);
+
     bool zBuffer() const;
     void setZBuffer(bool zBuffer);
 
@@ -138,6 +141,7 @@ private:
     QString m_speedState;
     QString m_pinState;
     QString m_bufferState;
+    QVector3D m_cursorPos;
     bool m_updatesEnabled;
 
     double normalizeAngle(double angle);

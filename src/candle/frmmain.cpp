@@ -2264,7 +2264,6 @@ void frmMain::onConnectionDataReceived(QString data)
                     m_timerToolAnimation.start(25, this);
                     ui->cmdSpindle->setChecked(true);
                 }
-                ui->slbSpindle->setCurrentValue(spindleSpeed.toDouble());
             } else if (m_timerToolAnimation.isActive()) {
                 m_timerToolAnimation.stop();
                 ui->cmdSpindle->setChecked(false);

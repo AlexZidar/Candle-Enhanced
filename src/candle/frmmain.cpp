@@ -157,6 +157,9 @@ void frmMain::initVariables()
 	m_statusForeColors[DeviceJog] = "black";
 	m_statusForeColors[DeviceSleep] = "white";
 
+    m_defaultColors["GridPrimary"] = "#E6E6E6";
+    m_defaultColors["GridSecondary"] = "#7F7F7F";
+
     m_fileChanged = false;
     m_heightMapChanged = false;
 
@@ -3741,7 +3744,16 @@ void frmMain::restoreSettings()
         m_settings->setAxisAX(set->value("axisAX", true).toBool());
 
         foreach (ColorPicker* pick, m_settings->colors()) {
-            pick->setColor(QColor(set->value(pick->objectName().mid(3), "black").toString()));
+            auto colorName = pick->objectName().mid(3);
+            auto colorValue = set->value(colorName);
+
+            if (colorValue.isValid()){
+                pick->setColor(QColor(colorValue.toString()));
+            } else if (m_defaultColors.contains(colorName)) {
+                pick->setColor(m_defaultColors[colorName]);
+            } else {
+                pick->setColor("black");
+            }
         }
 
         foreach (ColorPicker* pick, m_settings->paletteColors()) {
@@ -4123,6 +4135,10 @@ void frmMain::applySettings()
     m_codeDrawer->update();
 
     m_selectionDrawer->setColor(m_settings->colors("ToolpathHighlight"));
+
+    m_machineBoundsDrawer->setPrimaryColor(m_settings->colors("GridPrimary"));
+    m_machineBoundsDrawer->setSecondaryColor(m_settings->colors("GridSecondary"));
+    m_machineBoundsDrawer->update();
 
     ui->glwVisualizer->setLineWidth(m_settings->lineWidth());
     ui->glwVisualizer->setAntialiasing(m_settings->antialiasing());

@@ -8,6 +8,8 @@ MachineBoundsDrawer::MachineBoundsDrawer()
     m_pointSize = 4;
     m_gridSize = QSizeF(10, 10);
     m_borderRect = QRectF(0, 0, 1, 1);
+    m_primaryColor = QColor(230, 230, 230);
+    m_secondaryColor = QColor(127, 127, 127);
 }
 
 bool MachineBoundsDrawer::updateData()
@@ -16,8 +18,8 @@ bool MachineBoundsDrawer::updateData()
     m_lines.clear();
 
     // Color
-    QVector3D shadowColor(0.9f, 0.9f, 0.9f);
-    QVector3D mainColor(0.5f, 0.5f, 0.5f);
+    QVector3D shadowColor = Util::colorToVector(m_primaryColor);
+    QVector3D mainColor = Util::colorToVector(m_secondaryColor);
 
     // Border
     m_lines = {
@@ -91,6 +93,26 @@ void MachineBoundsDrawer::setBorderRect(const QRectF &borderRect)
 {
     m_borderRect = borderRect.normalized();
     update();
+}
+
+QColor MachineBoundsDrawer::primaryColor() const
+{
+    return m_primaryColor;
+}
+
+void MachineBoundsDrawer::setPrimaryColor(const QColor &color)
+{
+    m_primaryColor = color;
+}
+
+QColor MachineBoundsDrawer::secondaryColor() const
+{
+    return m_secondaryColor;
+}
+
+void MachineBoundsDrawer::setSecondaryColor(const QColor &color)
+{
+    m_secondaryColor = color;
 }
 
 QVector3D MachineBoundsDrawer::getMinimumExtremes()

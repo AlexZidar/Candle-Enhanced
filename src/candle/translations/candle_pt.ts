@@ -93,7 +93,7 @@
         <translation>ОК</translation>
     </message>
     <message>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;%1&lt;br/&gt;Version: %2&lt;br/&gt;Build: %3&lt;br/&gt;License: GNU GENERAL PUBLIC LICENSE&lt;br/&gt;Visit: &lt;a href=&quot;https://github.com/Denvi/Candle/&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;https://github.com/Denvi/Candle/&lt;br/&gt;&lt;/span&gt;&lt;/a&gt;© 2015-2025 Hayrullin Denis Ravilevich&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;%1&lt;br/&gt;Version: %2&lt;br/&gt;Build: %3&lt;br/&gt;License: GNU GENERAL PUBLIC LICENSE&lt;br/&gt;Visit: &lt;a href=&quot;https://github.com/Denvi/Candle/&quot;&gt;&lt;span style=&quot; text-decoration: underline;&quot;&gt;https://github.com/Denvi/Candle/&lt;br/&gt;&lt;/span&gt;&lt;/a&gt;© 2015-2026 Hayrullin Denis Ravilevich&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1509,6 +1509,18 @@ segment size:</source>
     <message>
         <source>Highlighted text:</source>
         <translation>Texto destacado:</translation>
+    </message>
+    <message>
+        <source>Grid</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Primary:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Secondary:</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

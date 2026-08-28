@@ -336,6 +336,7 @@ private:
     QMap<DeviceState, QString> m_statusCaptions;
     QMap<DeviceState, QString> m_statusBackColors;
     QMap<DeviceState, QString> m_statusForeColors;
+    QMap<QString, QString> m_defaultColors;
 
     QActionGroup *m_profilesActionGroup;
     QString m_currentProfileName;

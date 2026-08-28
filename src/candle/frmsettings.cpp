@@ -960,6 +960,9 @@ void frmSettings::setDefaultSettings()
     ui->clpToolpathStart->setColor(QColor(255, 0, 0));
     ui->clpToolpathEnd->setColor(QColor(0, 255, 0));
 
+    ui->clpGridPrimary->setColor(QColor(230, 230, 230));
+    ui->clpGridSecondary->setColor(QColor(127, 127, 127));
+
     setFontSize(9);
     setPanelWidth(40);
 

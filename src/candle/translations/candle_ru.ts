@@ -93,8 +93,8 @@
         <translation>ОК</translation>
     </message>
     <message>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;%1&lt;br/&gt;Version: %2&lt;br/&gt;Build: %3&lt;br/&gt;License: GNU GENERAL PUBLIC LICENSE&lt;br/&gt;Visit: &lt;a href=&quot;https://github.com/Denvi/Candle/&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;https://github.com/Denvi/Candle/&lt;br/&gt;&lt;/span&gt;&lt;/a&gt;© 2015-2025 Hayrullin Denis Ravilevich&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;%1&lt;br/&gt;Версия: %2&lt;br/&gt;Сборка: %3&lt;br/&gt;Лицензия: GNU GENERAL PUBLIC LICENSE&lt;br/&gt;Сайт: &lt;a href=&quot;https://github.com/Denvi/Candle/&quot;&gt;&lt;span style=&quot; text-decoration: underline; color:#0000ff;&quot;&gt;https://github.com/Denvi/Candle/&lt;br/&gt;&lt;/span&gt;&lt;/a&gt;© 2015-2025 Хайруллин Денис Равильевич&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;%1&lt;br/&gt;Version: %2&lt;br/&gt;Build: %3&lt;br/&gt;License: GNU GENERAL PUBLIC LICENSE&lt;br/&gt;Visit: &lt;a href=&quot;https://github.com/Denvi/Candle/&quot;&gt;&lt;span style=&quot; text-decoration: underline;&quot;&gt;https://github.com/Denvi/Candle/&lt;br/&gt;&lt;/span&gt;&lt;/a&gt;© 2015-2026 Hayrullin Denis Ravilevich&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;%1&lt;br/&gt;Версия: %2&lt;br/&gt;Сборка: %3&lt;br/&gt;Лицензия: GNU GENERAL PUBLIC LICENSE&lt;br/&gt;Сайт: &lt;a href=&quot;https://github.com/Denvi/Candle/&quot;&gt;&lt;span style=&quot; text-decoration: underline;&quot;&gt;https://github.com/Denvi/Candle/&lt;br/&gt;&lt;/span&gt;&lt;/a&gt;© 2015-2026 Хайруллин Денис Равильевич&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
 </context>
 <context>
@@ -1514,6 +1514,18 @@ segment size:</source>
     <message>
         <source>Highlighted text:</source>
         <translation>Выделенный текст:</translation>
+    </message>
+    <message>
+        <source>Grid</source>
+        <translation>Сетка</translation>
+    </message>
+    <message>
+        <source>Primary:</source>
+        <translation>Основной:</translation>
+    </message>
+    <message>
+        <source>Secondary:</source>
+        <translation>Вспомогательный:</translation>
     </message>
 </context>
 </TS>

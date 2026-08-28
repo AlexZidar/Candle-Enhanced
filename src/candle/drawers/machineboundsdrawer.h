@@ -19,6 +19,12 @@ public:
     QRectF borderRect() const;
     void setBorderRect(const QRectF &borderRect);
 
+    QColor primaryColor() const;
+    void setPrimaryColor(const QColor &color);
+
+    QColor secondaryColor() const;
+    void setSecondaryColor(const QColor &color);
+
     QVector3D getMinimumExtremes();
     QVector3D getMaximumExtremes();
 
@@ -28,6 +34,8 @@ protected:
 private:
     QSizeF m_gridSize;
     QRectF m_borderRect;
+    QColor m_primaryColor;
+    QColor m_secondaryColor;
 };
 
 #endif // MACHINEBOUNDSDRAWER_H

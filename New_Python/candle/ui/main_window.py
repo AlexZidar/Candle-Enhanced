@@ -1033,6 +1033,10 @@ class MainWindow(QMainWindow):
                 self.m_deviceState = st
                 break
 
+        # Notify Macro Runner of device state change
+        if hasattr(self, 'm_macroRunner') and self.m_macroRunner.isRunning():
+            self.m_macroRunner.onDeviceStateChanged(self.m_deviceState)
+
         # Check for Alarm state handling
         if self.m_deviceState == DeviceState.Alarm:
             if self.m_senderState == SenderState.Transferring:

@@ -75,6 +75,17 @@ class TestMacros(unittest.TestCase):
         found_after = [m for m in manager2.macros() if m.name == "Custom Chained Command"]
         self.assertEqual(len(found_after), 0)
 
+    def test_default_sample_macro_coordinates(self):
+        storage = SettingsStorage()
+        manager = MacroManager(storage)
+        prep = [m for m in manager.macros() if m.id == "default-prep-run"][0]
+        move_block = [b for b in prep.blocks if b.block_type == BlockType.MOVE_TO][0]
+        self.assertEqual(move_block.params["x"], 35.90)
+        self.assertEqual(move_block.params["y"], -271.00)
+        self.assertEqual(move_block.params["z"], -30.00)
+        self.assertEqual(move_block.params["coords"], "machine")
+        self.assertEqual(move_block.params["feed"], 1200)
+
 
 if __name__ == "__main__":
     unittest.main()

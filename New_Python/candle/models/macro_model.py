@@ -168,6 +168,14 @@ class MacroManager:
             else:
                 data = raw
             self.m_macros = [Macro.from_dict(d) for d in data]
+
+            # Migrate default sample macro to updated position if unchanged
+            for m in self.m_macros:
+                if m.id == "default-prep-run":
+                    for b in m.blocks:
+                        if b.block_type == BlockType.MOVE_TO and b.params.get("x") == 0.0 and b.params.get("y") == 0.0:
+                            b.params = {"x": 35.90, "y": -271.00, "z": -30.00, "feed": 1200, "coords": "machine"}
+                            self.save()
         except Exception:
             self._load_defaults()
 
@@ -187,7 +195,7 @@ class MacroManager:
             blocks=[
                 MacroBlock(BlockType.HOME),
                 MacroBlock(BlockType.SAFE_Z, {"clearance": 3.0}),
-                MacroBlock(BlockType.MOVE_TO, {"x": 0.0, "y": 0.0, "feed": 1200, "coords": "work"}),
+                MacroBlock(BlockType.MOVE_TO, {"x": 35.90, "y": -271.00, "z": -30.00, "feed": 1200, "coords": "machine"}),
                 MacroBlock(BlockType.PROMPT, {"message": "Position touch plate under bit and attach clip. Ready to probe?"}),
                 MacroBlock(BlockType.PROBE_Z, {"thickness": 15.0, "distance": 30.0, "search_feed": 40.0, "latch_feed": 10.0, "retract": 5.0}),
                 MacroBlock(BlockType.SPINDLE, {"state": "CW", "rpm": 10000, "delay": 2.0}),

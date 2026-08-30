@@ -1,0 +1,22 @@
+( Candle Sample Test Program )
+G21 ( Metric mm )
+G90 ( Absolute mode )
+G17 ( XY plane )
+M3 S8000 ( Spindle ON )
+G0 Z5.000 ( Safe Z )
+G0 X0.000 Y0.000
+G1 Z-1.000 F200
+G1 X50.000 Y0.000 F600
+G2 X75.000 Y25.000 I0.000 J25.000 ( 90 deg CW Arc )
+G1 X75.000 Y50.000
+G3 X50.000 Y75.000 I-25.000 J0.000 ( 90 deg CCW Arc )
+G1 X0.000 Y75.000
+G1 X0.000 Y0.000
+G0 Z5.000
+G0 X20.000 Y20.000
+G1 Z-0.500 F200
+G5 X40.000 Y40.000 I10.000 J0.000 P0.000 Q10.000 ( Cubic B-Spline )
+G0 Z5.000
+M5 ( Spindle OFF )
+G0 X0.000 Y0.000
+M2 ( Program End )

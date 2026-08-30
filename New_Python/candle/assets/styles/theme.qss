@@ -1,0 +1,210 @@
+/* Modern Clean Dark Theme for Candle GRBL Controller */
+
+QMainWindow {
+    background-color: #2b2b2b;
+    color: #e0e0e0;
+}
+
+QWidget {
+    font-family: "Segoe UI", "Helvetica Neue", "Arial", sans-serif;
+    font-size: 9pt;
+    color: #e0e0e0;
+}
+
+/* Docks */
+QDockWidget {
+    font-weight: bold;
+    color: #ffffff;
+    titlebar-close-icon: url(:/images/close.png);
+    titlebar-normal-icon: url(:/images/undock.png);
+}
+
+QDockWidget::title {
+    background-color: #383838;
+    padding: 6px 10px;
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+    border-bottom: 1px solid #4a4a4a;
+}
+
+QScrollArea {
+    background-color: transparent;
+    border: none;
+}
+
+QScrollArea > QWidget > QWidget {
+    background-color: transparent;
+}
+
+/* Group Boxes */
+QGroupBox {
+    border: 1px solid #484848;
+    border-radius: 5px;
+    margin-top: 10px;
+    padding-top: 12px;
+    padding-bottom: 6px;
+    padding-left: 6px;
+    padding-right: 6px;
+    font-weight: bold;
+    background-color: #323232;
+}
+
+QGroupBox::title {
+    subcontrol-origin: margin;
+    subcontrol-position: top left;
+    left: 8px;
+    padding: 0 4px;
+    color: #4da3ff;
+}
+
+/* Buttons */
+QPushButton {
+    background-color: #3e3e3e;
+    border: 1px solid #555555;
+    border-radius: 3px;
+    padding: 4px 8px;
+    min-height: 20px;
+    color: #ffffff;
+}
+
+QPushButton:hover {
+    background-color: #4a4a4a;
+    border-color: #666666;
+}
+
+QPushButton:pressed {
+    background-color: #2a2a2a;
+}
+
+QPushButton:disabled {
+    background-color: #282828;
+    color: #666666;
+    border-color: #3a3a3a;
+}
+
+/* Inputs & SpinBoxes */
+QLineEdit, QSpinBox, QDoubleSpinBox, QComboBox {
+    background-color: #222222;
+    border: 1px solid #484848;
+    border-radius: 3px;
+    padding: 3px 5px;
+    color: #ffffff;
+    selection-background-color: #1976d2;
+}
+
+QLineEdit:focus, QSpinBox:focus, QDoubleSpinBox:focus, QComboBox:focus {
+    border: 1px solid #1976d2;
+}
+
+QComboBox::drop-down {
+    subcontrol-origin: padding;
+    subcontrol-position: top right;
+    width: 18px;
+    border-left: 1px solid #444444;
+}
+
+/* Table View */
+QTableView {
+    background-color: #222222;
+    alternate-background-color: #282828;
+    gridline-color: #3a3a3a;
+    border: 1px solid #484848;
+    selection-background-color: #1565c0;
+    selection-color: #ffffff;
+}
+
+QHeaderView::section {
+    background-color: #333333;
+    color: #dddddd;
+    padding: 4px;
+    border: 1px solid #404040;
+    font-weight: bold;
+}
+
+/* Tab Bar */
+QTabBar::tab {
+    background: #333333;
+    color: #aaaaaa;
+    border: 1px solid #444444;
+    padding: 5px 12px;
+    border-top-left-radius: 3px;
+    border-top-right-radius: 3px;
+    margin-right: 2px;
+}
+
+QTabBar::tab:selected {
+    background: #444444;
+    color: #ffffff;
+    border-bottom-color: #444444;
+}
+
+QTabBar::tab:hover:!selected {
+    background: #3a3a3a;
+}
+
+/* Sliders */
+QSlider::groove:horizontal {
+    border: 1px solid #444444;
+    height: 6px;
+    background: #222222;
+    border-radius: 3px;
+}
+
+QSlider::sub-page:horizontal {
+    background: #1976d2;
+    border-radius: 3px;
+}
+
+QSlider::handle:horizontal {
+    background: #90caf9;
+    border: 1px solid #1565c0;
+    width: 14px;
+    margin-top: -5px;
+    margin-bottom: -5px;
+    border-radius: 7px;
+}
+
+QSlider::handle:horizontal:hover {
+    background: #bbdefb;
+}
+
+/* Scrollbars */
+QScrollBar:vertical {
+    background: #2b2b2b;
+    width: 10px;
+    margin: 0px;
+}
+
+QScrollBar::handle:vertical {
+    background: #555555;
+    min-height: 20px;
+    border-radius: 4px;
+}
+
+QScrollBar::handle:vertical:hover {
+    background: #777777;
+}
+
+QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
+    height: 0px;
+}
+
+QScrollBar:horizontal {
+    background: #2b2b2b;
+    height: 10px;
+    margin: 0px;
+}
+
+QScrollBar::handle:horizontal {
+    background: #555555;
+    min-width: 20px;
+    border-radius: 4px;
+}
+
+QScrollBar::handle:horizontal:hover {
+    background: #777777;
+}
+
+QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal {
+    width: 0px;
+}

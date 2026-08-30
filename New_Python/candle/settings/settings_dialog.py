@@ -216,7 +216,37 @@ class SettingsDialog(QDialog):
         spin_layout.addWidget(self.spnSpindleMax)
         form.addRow("Spindle RPM:", spin_layout)
 
+        # Touch Plate / Z-Probe Zeroing
+        grp_probe = QGroupBox("Touch Plate & Z-Probe Zeroing", tab)
+        form_probe = QFormLayout(grp_probe)
+
+        self.spnTouchPlateThickness = QDoubleSpinBox(tab)
+        self.spnTouchPlateThickness.setRange(0.01, 100.0)
+        self.spnTouchPlateThickness.setValue(15.0)
+        form_probe.addRow("Touch Plate Thickness (mm):", self.spnTouchPlateThickness)
+
+        self.spnProbeMaxDistance = QDoubleSpinBox(tab)
+        self.spnProbeMaxDistance.setRange(1.0, 200.0)
+        self.spnProbeMaxDistance.setValue(30.0)
+        form_probe.addRow("Max Search Distance (mm):", self.spnProbeMaxDistance)
+
+        self.spnProbeSearchFeed = QDoubleSpinBox(tab)
+        self.spnProbeSearchFeed.setRange(1.0, 1000.0)
+        self.spnProbeSearchFeed.setValue(40.0)
+        form_probe.addRow("Search Feed (mm/min):", self.spnProbeSearchFeed)
+
+        self.spnProbeLatchFeed = QDoubleSpinBox(tab)
+        self.spnProbeLatchFeed.setRange(1.0, 500.0)
+        self.spnProbeLatchFeed.setValue(10.0)
+        form_probe.addRow("Latch Feed (mm/min):", self.spnProbeLatchFeed)
+
+        self.spnProbeRetractHeight = QDoubleSpinBox(tab)
+        self.spnProbeRetractHeight.setRange(0.5, 100.0)
+        self.spnProbeRetractHeight.setValue(5.0)
+        form_probe.addRow("Retract Clearance (mm):", self.spnProbeRetractHeight)
+
         layout.addWidget(grp_ctrl)
+        layout.addWidget(grp_probe)
         layout.addStretch()
         self.tabs.addTab(tab, "Control")
 
@@ -330,6 +360,11 @@ class SettingsDialog(QDialog):
         self.spnSafeZ.setValue(float(s.get("Control/safeZ", 5.0)))
         self.chkSafeTravel.setChecked(bool(s.get("Control/safeTravel", True)))
         self.spnSafeTravelClearance.setValue(float(s.get("Control/safeTravelClearance", 3.0)))
+        self.spnTouchPlateThickness.setValue(float(s.get("Control/touchPlateThickness", 15.0)))
+        self.spnProbeMaxDistance.setValue(float(s.get("Control/probeMaxDistance", 30.0)))
+        self.spnProbeSearchFeed.setValue(float(s.get("Control/probeSearchFeed", 40.0)))
+        self.spnProbeLatchFeed.setValue(float(s.get("Control/probeLatchFeed", 10.0)))
+        self.spnProbeRetractHeight.setValue(float(s.get("Control/probeRetractHeight", 5.0)))
         self.spnRapidSpeed.setValue(int(s.get("Control/rapidSpeed", 1000)))
         self.spnAcceleration.setValue(int(s.get("Control/acceleration", 400)))
         self.spnQueryInterval.setValue(int(s.get("Control/queryStateTime", 200)))
@@ -373,6 +408,11 @@ class SettingsDialog(QDialog):
         s.set("Control/safeZ", self.spnSafeZ.value())
         s.set("Control/safeTravel", self.chkSafeTravel.isChecked())
         s.set("Control/safeTravelClearance", self.spnSafeTravelClearance.value())
+        s.set("Control/touchPlateThickness", self.spnTouchPlateThickness.value())
+        s.set("Control/probeMaxDistance", self.spnProbeMaxDistance.value())
+        s.set("Control/probeSearchFeed", self.spnProbeSearchFeed.value())
+        s.set("Control/probeLatchFeed", self.spnProbeLatchFeed.value())
+        s.set("Control/probeRetractHeight", self.spnProbeRetractHeight.value())
         s.set("Control/rapidSpeed", self.spnRapidSpeed.value())
         s.set("Control/acceleration", self.spnAcceleration.value())
         s.set("Control/queryStateTime", self.spnQueryInterval.value())

@@ -47,11 +47,15 @@ from ..widgets.gl_widget import GLWidget
 from ..widgets.slider_box import SliderBox
 from ..widgets.styled_tool_button import StyledToolButton
 from ..widgets.combo_box import ComboBoxKey
+from ..widgets.no_wheel_filter import NoWheelEventFilter
+from ..models.macro_model import Macro, MacroBlock, BlockType, MacroManager
+from ..kinematics.macro_runner import MacroRunner
 from .about_dialog import AboutDialog
 from .help_dialog import HelpDialog
 from .checklist_dialog import ChecklistDialog
 from .script_widget import ScriptWidget
 from .log_widget import LogWidget
+from .macro_builder_dialog import MacroBuilderDialog
 
 
 class MainWindow(QMainWindow):
@@ -107,6 +111,15 @@ class MainWindow(QMainWindow):
         self.m_lastJogTime: float = 0.0
         self.m_isRecoveringFromLimit: bool = False
 
+        # Touch Plate Z-Probe Zeroing State
+        self.m_isZeroProbing: bool = False
+        self.m_zeroProbeStage: int = 0
+
+        # Custom Macros & Command Chains Subsystem
+        self.m_macroManager = MacroManager(self.m_storage)
+        self.m_macroRunner = MacroRunner(self, self)
+        self.m_noWheelFilter = NoWheelEventFilter(self)
+
         # Initialize Drawers
         self.m_codeDrawer = GcodeDrawer()
         self.m_probeCodeDrawer = GcodeDrawer()
@@ -128,8 +141,18 @@ class MainWindow(QMainWindow):
         self._setup_connection()
         self._apply_settings()
 
+        # Install no-wheel filter on scrollable docks
+        self._install_no_wheel_filter(self.dockDevice)
+        self._install_no_wheel_filter(self.dockModification)
+
         # Keyboard event filter for jogging
         self.installEventFilter(self)
+
+    def _install_no_wheel_filter(self, widget: QWidget):
+        if isinstance(widget, (QSlider, QSpinBox, QDoubleSpinBox, QComboBox)):
+            widget.installEventFilter(self.m_noWheelFilter)
+        for child in widget.findChildren((QSlider, QSpinBox, QDoubleSpinBox, QComboBox)):
+            child.installEventFilter(self.m_noWheelFilter)
 
     def _build_ui(self):
         # Central Widget: G-Code Program Table & Stream Controls
@@ -386,13 +409,22 @@ class MainWindow(QMainWindow):
             grid_coord.addWidget(btn_ret, r, 4)
 
         row_all = QHBoxLayout()
-        btn_zero_all = QPushButton("Zero XYZ (G92)", wgt)
+        btn_zero_all = QPushButton("Zero XYZ", wgt)
         btn_zero_all.setFixedHeight(26)
         btn_zero_all.clicked.connect(lambda: self.sendCommand("G92 X0 Y0 Z0"))
+        
+        self.btnProbeZ = QPushButton("🔍 Probe Z", wgt)
+        self.btnProbeZ.setFixedHeight(26)
+        self.btnProbeZ.setStyleSheet("font-weight: bold; background-color: #1565c0; color: white;")
+        self.btnProbeZ.setToolTip("Auto Touch-Plate Z-Probe & Zero (G38.2 -> G92 Z{thickness})")
+        self.btnProbeZ.clicked.connect(self.probeZeroZ)
+
         btn_safe_z = QPushButton("Safe Z", wgt)
         btn_safe_z.setFixedHeight(26)
         btn_safe_z.clicked.connect(self.moveToSafeZ)
+        
         row_all.addWidget(btn_zero_all)
+        row_all.addWidget(self.btnProbeZ)
         row_all.addWidget(btn_safe_z)
 
         layout.addWidget(grp_coord)
@@ -673,26 +705,68 @@ class MainWindow(QMainWindow):
         self.addDockWidget(Qt.DockWidgetArea.BottomDockWidgetArea, self.dockConsole)
 
     def _build_user_dock(self):
-        self.dockUser = QDockWidget("User Commands & Macros", self)
+        self.dockUser = QDockWidget("Custom Macros & Command Chains", self)
         self.dockUser.setObjectName("dockUser")
+        
         wgt = QWidget(self.dockUser)
-        grid = QGridLayout(wgt)
-        grid.setContentsMargins(4, 4, 4, 4)
+        main_layout = QVBoxLayout(wgt)
+        main_layout.setContentsMargins(6, 6, 6, 6)
+        main_layout.setSpacing(6)
 
-        macros = [
-            ("Probe Z", "G38.2 Z-20 F20\nG92 Z0\nG0 Z5"),
-            ("Center Workpiece", "G90 G0 X0 Y0"),
-            ("Spindle 5000 RPM", "M3 S5000"),
-            ("Spindle OFF", "M5"),
-        ]
+        # Header with Open Macro Builder
+        hdr = QHBoxLayout()
+        lbl_info = QLabel("<b>Custom Macro Buttons:</b>", wgt)
+        self.btnOpenMacroBuilder = QPushButton("🛠 Macro Builder / Editor...", wgt)
+        self.btnOpenMacroBuilder.setStyleSheet("font-weight: bold; background: #1976d2; color: white;")
+        self.btnOpenMacroBuilder.clicked.connect(self.openMacroBuilder)
+        hdr.addWidget(lbl_info)
+        hdr.addStretch()
+        hdr.addWidget(self.btnOpenMacroBuilder)
+        main_layout.addLayout(hdr)
 
-        for i, (name, cmd) in enumerate(macros):
-            btn = QPushButton(name, wgt)
-            btn.clicked.connect(lambda ch, c=cmd: self.sendMacro(c))
-            grid.addWidget(btn, i // 2, i % 2)
+        # Scroll area for dynamic macro buttons
+        scroll = QScrollArea(wgt)
+        scroll.setWidgetResizable(True)
+        scroll.setFrameShape(QFrame.Shape.NoFrame)
+        self.wgtMacroButtons = QWidget()
+        self.gridMacroButtons = QGridLayout(self.wgtMacroButtons)
+        self.gridMacroButtons.setContentsMargins(2, 2, 2, 2)
+        self.gridMacroButtons.setSpacing(6)
+        scroll.setWidget(self.wgtMacroButtons)
+        main_layout.addWidget(scroll, stretch=1)
 
         self.dockUser.setWidget(wgt)
         self.addDockWidget(Qt.DockWidgetArea.BottomDockWidgetArea, self.dockUser)
+        self._rebuild_macro_buttons()
+
+    def _rebuild_macro_buttons(self):
+        while self.gridMacroButtons.count():
+            item = self.gridMacroButtons.takeAt(0)
+            w = item.widget()
+            if w:
+                w.deleteLater()
+
+        macros = self.m_macroManager.macros()
+        cols = 3
+        for i, macro in enumerate(macros):
+            r, c = divmod(i, cols)
+            btn = QPushButton(macro.name, self.wgtMacroButtons)
+            btn.setMinimumHeight(34)
+            color = macro.color or "#1976d2"
+            btn.setStyleSheet(
+                f"QPushButton {{ background-color: {color}; color: white; font-weight: bold; "
+                f"border-radius: 4px; padding: 4px 8px; font-size: 11px; }} "
+                f"QPushButton:hover {{ background-color: #333333; border: 1px solid {color}; }} "
+                f"QPushButton:pressed {{ background-color: #111111; }}"
+            )
+            btn.setToolTip(f"Execute Macro Chain '{macro.name}' ({len(macro.blocks)} steps)")
+            btn.clicked.connect(lambda ch, m=macro: self.m_macroRunner.runMacro(m))
+            self.gridMacroButtons.addWidget(btn, r, c)
+
+    def openMacroBuilder(self):
+        dlg = MacroBuilderDialog(self.m_macroManager, self.m_macroRunner, self)
+        dlg.exec()
+        self._rebuild_macro_buttons()
 
     def _build_script_dock(self):
         self.dockScript = QDockWidget("Scripting", self)
@@ -757,6 +831,9 @@ class MainWindow(QMainWindow):
 
         # Service Menu
         m_service = mb.addMenu("&Service")
+        act_macro_builder = m_service.addAction("&Macro Builder / Editor...")
+        act_macro_builder.triggered.connect(self.openMacroBuilder)
+        
         act_settings = m_service.addAction("&Settings...")
         act_settings.setShortcut(QKeySequence.StandardKey.Preferences)
         act_settings.triggered.connect(self.openSettings)
@@ -1017,8 +1094,22 @@ class MainWindow(QMainWindow):
         # Format: [PRB:X,Y,Z:1]
         m = re.search(r'\[PRB:([-\d.]+),([-\d.]+),([-\d.]+):(\d+)\]', report)
         if m:
+            px = float(m.group(1))
+            py = float(m.group(2))
             pz = float(m.group(3))
             succ = (int(m.group(4)) == 1)
+
+            # 1. Route to Macro Runner if active
+            if hasattr(self, 'm_macroRunner') and self.m_macroRunner.isRunning():
+                self.m_macroRunner.onProbeReportReceived(pz, succ)
+                return
+
+            # 2. Touch Plate Zeroing Routine
+            if getattr(self, 'm_isZeroProbing', False):
+                self._handle_zero_probe_result(pz, succ)
+                return
+
+            # 3. Heightmap auto-level probing
             if succ and self.m_isProbing:
                 self._record_probe_point(pz)
 
@@ -1206,6 +1297,59 @@ class MainWindow(QMainWindow):
 
     def zeroAxis(self, axis: str):
         self.sendCommand(f"G92 {axis}0")
+
+    def probeZeroZ(self):
+        if self.m_senderState == SenderState.Transferring:
+            self.logWidget.appendLog("Cannot probe: G-code streaming is active.", "WARN")
+            return
+        if not self.m_connection or not self.m_connection.isConnected():
+            self.logWidget.appendLog("Cannot probe: Controller is not connected.", "ERROR")
+            return
+
+        thickness = float(self.m_storage.get("Control/touchPlateThickness", 15.0))
+        dist = float(self.m_storage.get("Control/probeMaxDistance", 30.0))
+        feed = float(self.m_storage.get("Control/probeSearchFeed", 40.0))
+
+        self.m_isZeroProbing = True
+        self.m_zeroProbeStage = 1
+
+        self.logWidget.appendLog(f"Starting Z-Probe Zeroing (Search: -{dist:.0f}mm at {feed:.0f}mm/min, Plate: {thickness:.2f}mm)...", "INFO")
+        self.txtConsole.append(
+            f"<span style='color:#2196f3; font-weight:bold;'>[Z-PROBE START] Probing down max {dist:.0f}mm for touch plate ({thickness:.2f}mm)...</span>"
+        )
+
+        self.sendCommand("G21 G91")
+        self.sendCommand(f"G38.2 Z-{dist:.3f} F{feed:.0f}")
+
+    def _handle_zero_probe_result(self, z_val: float, succ: bool):
+        if not succ:
+            self.m_isZeroProbing = False
+            self.logWidget.appendLog("Z-Probe failed: Touch plate contact not detected within search distance.", "ERROR")
+            self.txtConsole.append("<span style='color:red; font-weight:bold;'>[Z-PROBE FAILED] Touch plate contact not detected.</span>")
+            return
+
+        if self.m_zeroProbeStage == 1:
+            # First search contact made -> lift 1.5mm and perform slow precision latch probe
+            self.m_zeroProbeStage = 2
+            latch_feed = float(self.m_storage.get("Control/probeLatchFeed", 10.0))
+            self.sendCommand("G91 G0 Z1.500")
+            self.sendCommand(f"G38.2 Z-3.000 F{latch_feed:.0f}")
+
+        elif self.m_zeroProbeStage == 2:
+            # Final precision latch contact made -> set work Z to plate thickness and retract
+            self.m_isZeroProbing = False
+            thickness = float(self.m_storage.get("Control/touchPlateThickness", 15.0))
+            retract = float(self.m_storage.get("Control/probeRetractHeight", 5.0))
+
+            self.sendCommand("G90")
+            self.sendCommand(f"G92 Z{thickness:.3f}")
+            self.sendCommand(f"G91 G0 Z{retract:.3f}")
+            self.sendCommand("G90")
+
+            self.logWidget.appendLog(f"Z-Axis zeroed using touch plate ({thickness:.2f}mm). Retracted {retract:.1f}mm.", "INFO")
+            self.txtConsole.append(
+                f"<span style='color:#4caf50; font-weight:bold;'>[Z-PROBE SUCCESS] Work Z set to {thickness:.3f}mm (Plate Thickness). Retracted {retract:.1f}mm.</span>"
+            )
 
     def returnAxis(self, axis: str):
         self.sendCommand(f"G90 G0 {axis}0")

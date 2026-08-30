@@ -7,6 +7,16 @@ from PyQt6.QtWidgets import (
 )
 
 
+class NoWheelSlider(QSlider):
+    def wheelEvent(self, event):
+        event.ignore()
+
+
+class NoWheelSpinBox(QSpinBox):
+    def wheelEvent(self, event):
+        event.ignore()
+
+
 class SliderBox(QWidget):
     valueChanged = pyqtSignal()
     valueUserChanged = pyqtSignal()
@@ -37,7 +47,7 @@ class SliderBox(QWidget):
         self.lblTitle = QLabel(self)
         self.lblTitle.setVisible(False)
 
-        self.txtValue = QSpinBox(self)
+        self.txtValue = NoWheelSpinBox(self)
         self.txtValue.setRange(self.m_minimum, self.m_maximum)
         self.txtValue.setValue(0)
         self.txtValue.editingFinished.connect(self._on_txt_editing_finished)
@@ -51,7 +61,7 @@ class SliderBox(QWidget):
         main_layout.addLayout(header_layout)
 
         # Slider
-        self.sliValue = QSlider(Qt.Orientation.Horizontal, self)
+        self.sliValue = NoWheelSlider(Qt.Orientation.Horizontal, self)
         self.sliValue.setRange(self.m_minimum, self.m_maximum)
         self.sliValue.setValue(0)
         self.sliValue.valueChanged.connect(self._on_slider_value_changed)
